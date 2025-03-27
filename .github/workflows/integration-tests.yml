@@ -31,14 +31,12 @@ jobs:
 
       - name: Get current build count
         id: get-current-build-count
-        env:
-          PIPELINE_ID: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}
         run: |
           echo "Getting current build count for pipeline ID $PIPELINE_ID"
           LAST_BUILD=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64 -w0)" \
             "${{ vars.ADO_URL }}/_apis/build/builds?api-version=6.0&definitions=$PIPELINE_ID&queryOrder=queueTimeDescending&\$top=1" | \
             jq '.value[0].id')
-          echo "CURRENT_BUILD_COUNT=$LAST_BUILD" >> $GITHUB_ENV
+          echo "LAST_BUILD=$LAST_BUILD" >> $GITHUB_ENV
           echo "Current build count: $LAST_BUILD"
       
       - uses: tjcorr/pipelines@node20
@@ -48,9 +46,6 @@ jobs:
           azure-devops-token: ${{ secrets.ADO_TOKEN }}
           
       - name: Verify new pipeline execution
-        env:
-          PIPELINE_ID: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}
-          LAST_BUILD: ${{ steps.get-current-build-count.outputs.CURRENT_BUILD_COUNT }}
         run: |
           echo "Verifying new pipeline execution was created"
           sleep 10 # Give ADO API some time to register the new build
