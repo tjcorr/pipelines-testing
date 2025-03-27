@@ -13,7 +13,7 @@ jobs:
         env:
           PIPELINE_NAME: it-basic
         run: |
-          echo "Getting build definition ID for pipeline 'it-basic'"
+          echo "Getting build definition ID for pipeline $PIPELINE_NAME"
           DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64 -w0)" \
             "${{ vars.ADO_URL }}/_apis/build/definitions?name=$PIPELINE_NAME")
 
@@ -63,7 +63,7 @@ jobs:
           echo "New build count: $NEW_BUILD"
           echo "Previous build count: $LAST_BUILD"
           
-          if [ "$NEW_BUILD" -gt "LAST_BUILD" ]; then
+          if [ "$NEW_BUILD" -gt "$LAST_BUILD" ]; then
             echo "✅ New pipeline execution confirmed!"
           else
             echo "❌ No new pipeline execution detected!"
