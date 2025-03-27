@@ -8,8 +8,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get current build count
+        id: get-current-builds
+        run: |
+          echo "Getting current build count for pipeline 'it-basic'"
+          BUILD_COUNT=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64)" \
+            "${{ vars.ADO_URL }}/_apis/build/builds?api-version=6.0&definitions=it-basic&queryOrder=queueTimeDescending" | \
+            jq '.count')
+          echo "CURRENT_BUILD_COUNT=$BUILD_COUNT" >> $GITHUB_ENV
+          echo "Current build count: $BUILD_COUNT"
+      
       - uses: tjcorr/pipelines@node20
         with: 
           azure-devops-project-url: ${{ vars.ADO_URL }}
           azure-pipeline-name: 'it-basic'
           azure-devops-token: ${{ secrets.ADO_TOKEN }}
+          
+      - name: Verify new pipeline execution
+        run: |
+          echo "Verifying new pipeline execution was created"
+          sleep 10 # Give ADO API some time to register the new build
+          NEW_BUILD_COUNT=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64)" \
+            "${{ vars.ADO_URL }}/_apis/build/builds?api-version=6.0&definitions=it-basic&queryOrder=queueTimeDescending" | \
+            jq '.count')
+          echo "New build count: $NEW_BUILD_COUNT"
+          echo "Previous build count: ${{ env.CURRENT_BUILD_COUNT }}"
+          
+          if [ "$NEW_BUILD_COUNT" -gt "${{ env.CURRENT_BUILD_COUNT }}" ]; then
+            echo "✅ New pipeline execution confirmed!"
+          else
+            echo "❌ No new pipeline execution detected!"
+            exit 1
+          fi
