@@ -8,15 +8,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get current build count
-        id: get-current-builds
+      - name: Get build definition ID
+        id: get-build-definition-id
+        env:
+          PIPELINE_NAME: it-basic
         run: |
-          echo "Getting current build count for pipeline 'it-basic'"
-          BUILD_COUNT=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64)" \
-            "${{ vars.ADO_URL }}/_apis/build/builds?api-version=6.0&definitions=it-basic&queryOrder=queueTimeDescending" | \
-            jq '.count')
-          echo "CURRENT_BUILD_COUNT=$BUILD_COUNT" >> $GITHUB_ENV
-          echo "Current build count: $BUILD_COUNT"
+          echo "Getting build definition ID for pipeline 'it-basic'"
+          DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64 -w0)" \
+            "${{ vars.ADO_URL }}/_apis/build/definitions?name=$PIPELINE_NAME")
+
+          if [ $(echo "$DEF_RESULTS" | jq .count) -gt 1 ]; then
+              echo "Error: More than one pipeline found with name '$PIPELINE_NAME'."
+              exit 1
+          elif [ $(echo "$DEF_RESULTS" | jq .count) -eq 0 ]; then
+              echo "Error: No pipeline found with name '$PIPELINE_NAME'."
+              exit 1
+          else
+              BUILD_DEFINITION_ID=$(echo "$DEF_RESULTS" | jq -r '.value[0].id')
+              echo "Build definition ID for pipeline '$PIPELINE_NAME' is $BUILD_DEFINITION_ID."
+              echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_ENV
+          fi
+
+      - name: Get current build count
+        id: get-current-build-count
+        env:
+          PIPELINE_ID: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}
+        run: |
+          echo "Getting current build count for pipeline ID $PIPELINE_ID"
+          LAST_BUILD=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64 -w0)" \
+            "${{ vars.ADO_URL }}/_apis/build/builds?api-version=6.0&definitions=$PIPELINE_ID&queryOrder=queueTimeDescending&\$top=1" | \
+            jq '.value[0].id')
+          echo "CURRENT_BUILD_COUNT=$LAST_BUILD" >> $GITHUB_ENV
+          echo "Current build count: $LAST_BUILD"
       
       - uses: tjcorr/pipelines@node20
         with: 
@@ -25,16 +48,22 @@ jobs:
           azure-devops-token: ${{ secrets.ADO_TOKEN }}
           
       - name: Verify new pipeline execution
+        env:
+          PIPELINE_ID: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}
+          LAST_BUILD: ${{ steps.get-current-build-count.outputs.CURRENT_BUILD_COUNT }}
         run: |
           echo "Verifying new pipeline execution was created"
           sleep 10 # Give ADO API some time to register the new build
-          NEW_BUILD_COUNT=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64)" \
-            "${{ vars.ADO_URL }}/_apis/build/builds?api-version=6.0&definitions=it-basic&queryOrder=queueTimeDescending" | \
-            jq '.count')
-          echo "New build count: $NEW_BUILD_COUNT"
-          echo "Previous build count: ${{ env.CURRENT_BUILD_COUNT }}"
+
+          echo "Getting current build count for pipeline ID $PIPELINE_ID"
+          NEW_BUILD=$(curl -s -H "Authorization: Basic $(echo -n ":${{ secrets.ADO_TOKEN }}" | base64 -w0)" \
+            "${{ vars.ADO_URL }}/_apis/build/builds?api-version=6.0&definitions=$PIPELINE_ID&queryOrder=queueTimeDescending&\$top=1" | \
+            jq '.value[0].id')
+
+          echo "New build count: $NEW_BUILD"
+          echo "Previous build count: $LAST_BUILD"
           
-          if [ "$NEW_BUILD_COUNT" -gt "${{ env.CURRENT_BUILD_COUNT }}" ]; then
+          if [ "$NEW_BUILD" -gt "LAST_BUILD" ]; then
             echo "✅ New pipeline execution confirmed!"
           else
             echo "❌ No new pipeline execution detected!"
