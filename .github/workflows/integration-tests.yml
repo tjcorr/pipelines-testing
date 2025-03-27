@@ -11,4 +11,5 @@ jobs:
       - uses: tjcorr/pipelines@node20
         with: 
           azure-devops-project-url: ${{ vars.ADO_URL }}
+          azure-pipeline-name: 'it-basic'
           azure-devops-token: ${{ secrets.ADO_TOKEN }}
