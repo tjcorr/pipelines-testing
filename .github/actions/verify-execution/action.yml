@@ -16,7 +16,6 @@ inputs:
 
 runs:
   using: "composite"
-  shell: bash
   steps:
     - name: Get new build count
       id: get-current-build-count
@@ -30,6 +29,7 @@ runs:
       with:
         OLD_BUILD_COUNT: ${{ inputs.old-build-count }}
         NEW_BUILD_COUNT: ${{ steps.get-current-build-count.outputs.CURRENT_BUILD_COUNT }}
+      shell: bash
       run: |
         echo "Verifying new pipeline execution was created"
 

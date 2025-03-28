@@ -17,7 +17,6 @@ outputs:
 
 runs:
   using: "composite"
-  shell: bash
   steps:
     - name: Get build definition ID
       id: get-build-definition-id
@@ -25,6 +24,7 @@ runs:
         PIPELINE_NAME: ${{ inputs.pipeline-name }}
         ADO_TOKEN: ${{ inputs.ado_token }}
         ADO_URL: ${{ inputs.ado_url }}
+      shell: bash
       run: |
         echo "Getting build definition ID for pipeline $PIPELINE_NAME"
         DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":$ADO_TOKEN" | base64 -w0)" \
