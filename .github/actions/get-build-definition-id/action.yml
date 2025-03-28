@@ -17,6 +17,7 @@ outputs:
 
 runs:
   using: "composite"
+  shell: bash
   steps:
     - name: Get build definition ID
       id: get-build-definition-id

@@ -17,6 +17,7 @@ outputs:
 
 runs:
   using: "composite"
+  shell: bash
   steps:
     - name: Get current build count
       id: get-current-build-count

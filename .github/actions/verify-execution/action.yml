@@ -16,6 +16,7 @@ inputs:
 
 runs:
   using: "composite"
+  shell: bash
   steps:
     - name: Get new build count
       id: get-current-build-count
