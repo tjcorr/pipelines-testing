@@ -2,6 +2,9 @@ name: Integration Tests
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   basic:
@@ -11,7 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Get build definition ID
         id: get-build-definition-id
         uses: ./.github/actions/get-build-definition-id
