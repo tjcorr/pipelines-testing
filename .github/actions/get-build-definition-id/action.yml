@@ -43,7 +43,7 @@ runs:
     - name: Test output
       shell: bash
       run: |
-        echo "output: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}"
+        echo "output: ${{ steps.get-build-definition-id.outputs }}"
         echo "env: $PIPELINE_ID"
         echo "env: ${{ env.PIPELINE_ID }}"
         echo "b: $BUILD_DEFINITION_ID"
