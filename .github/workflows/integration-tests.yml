@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Get build definition ID
-        id: get-build-definition-id
+        id: dummy
         uses: ./.github/actions/get-build-definition-id
         with:
           pipeline-name: 'it-basic'
@@ -25,16 +25,16 @@ jobs:
 
       - name: Test
         run: |
-          echo "Running integration tests for pipeline ID: ${{ steps.get-build-definition-id.outputs.pipeline-id }}"
+          echo "Running integration tests for pipeline ID: ${{ steps.dummy.outputs.pipeline-id }}"
           env
         env:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
+          pipeline-id: ${{ steps.dummy.outputs.pipeline-id }}
 
       - name: Get current build count
         id: get-current-build-count
         uses: ./.github/actions/get-current-build-count
         with:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
+          pipeline-id: ${{ steps.dummy.outputs.pipeline-id }}
           ado-token: ${{ secrets.ADO_TOKEN }}
           ado-url: ${{ vars.ADO_URL }}
 
@@ -47,7 +47,7 @@ jobs:
       - name: Verify new pipeline execution
         uses: ./.github/actions/verify-execution
         with:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline }}
+          pipeline-id: ${{ steps.dummy.outputs.pipeline }}
           ado-token: ${{ secrets.ADO_TOKEN }}
           ado-url: ${{ vars.ADO_URL }}
           old-build-count: ${{ steps.get-current-build-count.outputs.current-build-count }}
