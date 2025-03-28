@@ -36,10 +36,6 @@ runs:
 
         # Fetch the latest build details
         BUILD_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":$ADO_TOKEN" | base64 -w0)" "$ADO_URL/_apis/build/builds/$BUILD_ID")
-        echo "Build results: $BUILD_RESULTS"
-        echo "Formatting build results for readability"
-        BUILD_RESULTS_CLEAN=$(echo "$BUILD_RESULTS" | jq .)
-        echo "build results: $BUILD_RESULTS_CLEAN"
 
         # Verify definition.name matches the pipeline name
         BUILD_DEFINITION_NAME=$(echo "$BUILD_RESULTS" | jq -r '.definition.name')
@@ -57,10 +53,10 @@ runs:
 
         # If we have build variables, verify they match paramters
         if [ -n "$VARIABLES" ]; then
-          # echo "variables: $VARIABLES"
+          echo "variables: $VARIABLES"
           
-          # echo "build_results: $BUILD_RESULTS"
-          # echo "parameters: $(echo "$BUILD_RESULTS" | jq -c '.parameters)"
+          DEBUG_PARAMETERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters)
+          echo "parameters: $DEBUG_PARAMETERS"
 
           PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson | sort_by(keys | tostring)')
           NORMALIZED_VARIABLES=$(echo "$VARIABLES" | jq -c 'sort_by(keys | tostring)')
