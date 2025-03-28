@@ -19,7 +19,7 @@ runs:
   steps:
     - name: Get new build count
       id: get-current-build-count
-      uses: ./.github/actions/get-build-definition-id
+      uses: ./.github/actions/get-current-build-count
       with:
         pipeline-id: ${{ inputs.pipeline-id }}
         ado-token: ${{ inputs.ado-token }}

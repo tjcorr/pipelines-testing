@@ -18,11 +18,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Random Number Generator
-      id: random-number-generator
-      run: echo "random-number=$(echo $RANDOM)" >> $GITHUB_OUTPUT
-      shell: bash
-
     - name: Get build definition ID
       id: get-build-definition-id
       shell: bash
