@@ -39,6 +39,17 @@ runs:
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_ENV
         fi
 
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
+
+    - name: Dump GitHub context
+      env:
+        STEPS_CONTEXT: ${{ toJson(steps) }}
+      run: |
+        echo "$STEPS_CONTEXT"
 
     - name: Test output
       shell: bash
