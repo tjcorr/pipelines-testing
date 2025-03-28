@@ -26,9 +26,13 @@ jobs:
       - name: Test
         run: |
           echo "Running integration tests for pipeline ID: ${{ steps.dummy.outputs.pipeline-id }}"
+
+      - name: Test 2
+        run: |
+          echo "Running integration tests for pipeline ID: $PIPE"
           env
         env:
-          pipeline-id: ${{ steps.dummy.outputs.pipeline-id }}
+          PIPE: ${{ steps.dummy.outputs.pipeline-id }}
 
       - name: Get current build count
         id: get-current-build-count
