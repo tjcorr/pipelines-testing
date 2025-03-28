@@ -27,13 +27,16 @@ runs:
 
     - name: Verify new pipeline execution
       shell: bash
+      env:
+        NEW_BUILD_COUNT: ${{ steps.get-current-build-count.outputs.current-build-count }}
+        OLD_BUILD_COUNT: ${{ inputs.old-build-count }}
       run: |
         echo "Verifying new pipeline execution was created"
 
-        echo "New build count: ${{ steps.get-current-build-count.outputs.CURRENT_BUILD_COUNT }}"
-        echo "Previous build count: ${{ inputs.old-build-count }}"
+        echo "New build count: $NEW_BUILD_COUNT"
+        echo "Previous build count: $OLD_BUILD_COUNT"
 
-        if [ "${{ steps.get-current-build-count.outputs.CURRENT_BUILD_COUNT }}" -gt "${{ inputs.old-build-count }}" ]; then
+        if [ "$NEW_BUILD_COUNT" -gt "$OLD_BUILD_COUNT" ]; then
           echo "✅ New pipeline execution confirmed!"
         else
           echo "❌ No new pipeline execution detected!"

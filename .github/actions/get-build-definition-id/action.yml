@@ -18,40 +18,32 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Random Number Generator
+      id: random-number-generator
+      run: echo "random-number=$(echo $RANDOM)" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Get build definition ID
       id: get-build-definition-id
       shell: bash
+      env:
+        PIPELINE_NAME: ${{ inputs.pipeline-name }}
+        ADO_TOKEN: ${{ inputs.ado-token }}
+        ADO_URL: ${{ inputs.ado-url }}
       run: |
-        echo "PRE_TEST=123" >> $GITHUB_ENV
-
-        echo "Getting build definition ID for pipeline ${{ inputs.pipeline-name }}"
-        DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":${{ inputs.ado-token }}" | base64 -w0)" \
-          "${{ inputs.ado-url }}/_apis/build/definitions?name=${{ inputs.pipeline-name }}")
+        echo "Getting build definition ID for pipeline $PIPELINE_NAME"
+        DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":$ADO_TOKEN" | base64 -w0)" \
+          "$ADO_URL/_apis/build/definitions?name=$PIPELINE_NAME")
 
         if [ $(echo "$DEF_RESULTS" | jq .count) -gt 1 ]; then
-            echo "Error: More than one pipeline found with name '${{ inputs.pipeline-name }}'."
+            echo "Error: More than one pipeline found with name '$PIPELINE_NAME'."
             exit 1
         elif [ $(echo "$DEF_RESULTS" | jq .count) -eq 0 ]; then
-            echo "Error: No pipeline found with name '${{ inputs.pipeline-name }}'."
+            echo "Error: No pipeline found with name '$PIPELINE_NAME'."
             exit 1
         else
             BUILD_DEFINITION_ID=$(echo "$DEF_RESULTS" | jq -r '.value[0].id')
-            echo "Build definition ID for pipeline '${{ inputs.pipeline-name }}' is $BUILD_DEFINITION_ID."
+            echo "Build definition ID for pipeline '$PIPELINE_NAME' is $BUILD_DEFINITION_ID."
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID"
-            echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_ENV
-            echo "MID_TEST=456" >> $GITHUB_ENV
+            echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_OUTPUT
         fi
-
-        echo "POST_TEST=789" >> $GITHUB_ENV
-
-    - name: Test output
-      shell: bash
-      run: |
-        echo "output: ${{ toJson(steps) }}"
-        echo "env: $PIPELINE_ID"
-        echo "env: ${{ env.PIPELINE_ID }}"
-        echo "b: $BUILD_DEFINITION_ID"
-        echo "c: ${{ steps.get-build-definition-id.outputs.BUILD_DEFINITION_ID }}" 
-
-
-
