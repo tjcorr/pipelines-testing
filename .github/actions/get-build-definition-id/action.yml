@@ -35,16 +35,19 @@ runs:
         else
             BUILD_DEFINITION_ID=$(echo "$DEF_RESULTS" | jq -r '.value[0].id')
             echo "Build definition ID for pipeline '${{ inputs.pipeline-name }}' is $BUILD_DEFINITION_ID."
+            echo "PIPELINE_ID=$BUILD_DEFINITION_ID"
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_ENV
         fi
 
-    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
-      shell: bash
 
     - name: Test output
       shell: bash
       run: |
         echo "output: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}"
+        echo "env: $PIPELINE_ID"
+        echo "env: ${{ env.PIPELINE_ID }}"
+        echo "b: $BUILD_DEFINITION_ID"
+        echo "c: ${{ steps.get-build-definition-id.outputs.BUILD_DEFINITION_ID }}" 
 
 
 
