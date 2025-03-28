@@ -11,6 +11,9 @@ jobs:
     name: Test Basic Pipeline Execution with No Parameters
     runs-on: ubuntu-latest
 
+    env:
+      pipeline-name: 'it-basic'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,7 +22,7 @@ jobs:
         id: get-build-definition-id
         uses: ./.github/actions/get-build-definition-id
         with:
-          pipeline-name: 'it-basic'
+          pipeline-name: ${{ env.pipeline-name }}
           ado-token: ${{ secrets.ADO_TOKEN }}
           ado-url: ${{ vars.ADO_URL }}
 
@@ -34,9 +37,55 @@ jobs:
       - uses: tjcorr/pipelines@node20
         with: 
           azure-devops-project-url: ${{ vars.ADO_URL }}
-          azure-pipeline-name: 'it-basic'
+          azure-pipeline-name: ${{ env.pipeline-name }}
           azure-devops-token: ${{ secrets.ADO_TOKEN }}
           
+      - name: Verify new pipeline execution
+        uses: ./.github/actions/verify-execution
+        with:
+          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
+          ado-token: ${{ secrets.ADO_TOKEN }}
+          ado-url: ${{ vars.ADO_URL }}
+          old-build-count: ${{ steps.get-current-build-count.outputs.current-build-count }}
+
+  basic-with-variables:
+    name: Test Basic Pipeline Execution with Variables
+    runs-on: ubuntu-latest
+
+    env:
+      pipeline-name: 'it-basic-var'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get build definition ID
+        id: get-build-definition-id
+        uses: ./.github/actions/get-build-definition-id
+        with:
+          pipeline-name: ${{ env.pipeline-name }}
+          ado-token: ${{ secrets.ADO_TOKEN }}
+          ado-url: ${{ vars.ADO_URL }}
+
+      - name: Get current build count
+        id: get-current-build-count
+        uses: ./.github/actions/get-current-build-count
+        with:
+          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
+          ado-token: ${{ secrets.ADO_TOKEN }}
+          ado-url: ${{ vars.ADO_URL }}
+
+      - uses: tjcorr/pipelines@node20
+        with: 
+          azure-devops-project-url: ${{ vars.ADO_URL }}
+          azure-pipeline-name: ${{ env.pipeline-name }}
+          azure-devops-token: ${{ secrets.ADO_TOKEN }}
+          azure-pipeline-variables: |
+            '{
+              "testVar1": "testValue1",
+              "testVar2": "testValue2"
+            }'
+
       - name: Verify new pipeline execution
         uses: ./.github/actions/verify-execution
         with:
