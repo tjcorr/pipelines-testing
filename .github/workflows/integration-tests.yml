@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: tjcorr/pipelines@node20
-        id: 
+        id: build
         with: 
           azure-devops-project-url: ${{ vars.ADO_URL }}
           azure-pipeline-name: ${{ env.pipeline-name }}
