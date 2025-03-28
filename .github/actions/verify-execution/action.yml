@@ -42,7 +42,7 @@ runs:
         echo "build results: $BUILD_RESULTS_CLEAN"
 
         # Verify definition.name matches the pipeline name
-        BUILD_DEFINITION_NAME=$(echo \"$BUILD_RESULTS\" | jq -r '.definition.name')
+        BUILD_DEFINITION_NAME=$(echo "$BUILD_RESULTS" | jq -r '.definition.name')
         if [ "$BUILD_DEFINITION_NAME" != "$PIPELINE_NAME" ]; then
           echo "❌ Pipeline name does not match the expected name! Found: $BUILD_DEFINITION_NAME, Expected: $PIPELINE_NAME"
           exit 1
