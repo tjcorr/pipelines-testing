@@ -20,21 +20,25 @@ runs:
   steps:
     - name: Get build definition ID
       id: get-build-definition-id
+      env:
+        PIPELINE_NAME: ${{ inputs.pipeline-name }}
+        ADO_TOKEN: ${{ inputs.ado-token }}
+        ADO_URL: ${{ inputs.ado-url }}
       shell: bash
       run: |
-        echo "Getting build definition ID for pipeline ${{ inputs.pipeline-name }}"
-        DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":${{ inputs.ado-token }}" | base64 -w0)" \
-          "${{ inputs.ado-url }}/_apis/build/definitions?name=${{ inputs.pipeline-name }}")
+        echo "Getting build definition ID for pipeline $PIPELINE_NAME"
+        DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":$ADO_TOKEN" | base64 -w0)" \
+          "$ADO_URL/_apis/build/definitions?name=$PIPELINE_NAME")
 
         if [ $(echo "$DEF_RESULTS" | jq .count) -gt 1 ]; then
-            echo "Error: More than one pipeline found with name '${{ inputs.pipeline-name }}'."
+            echo "Error: More than one pipeline found with name '$PIPELINE_NAME'."
             exit 1
         elif [ $(echo "$DEF_RESULTS" | jq .count) -eq 0 ]; then
-            echo "Error: No pipeline found with name '${{ inputs.pipeline-name }}'."
+            echo "Error: No pipeline found with name '$PIPELINE_NAME'."
             exit 1
         else
             BUILD_DEFINITION_ID=$(echo "$DEF_RESULTS" | jq -r '.value[0].id')
-            echo "Build definition ID for pipeline '${{ inputs.pipeline-name }}' is $BUILD_DEFINITION_ID."
+            echo "Build definition ID for pipeline '$PIPELINE_NAME' is $BUILD_DEFINITION_ID."
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_ENV
         fi
 
