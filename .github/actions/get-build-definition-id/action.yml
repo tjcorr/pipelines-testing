@@ -4,10 +4,10 @@ inputs:
   pipeline-name: 
     description: 'The name of the pipeline to get the build definition ID for'
     required: true
-  ado_token: 
+  ado-token: 
     description: 'The Azure DevOps PAT token'
     required: true
-  ado_url: 
+  ado-url: 
     description: 'The Azure DevOps URL'
     required: true
 outputs:

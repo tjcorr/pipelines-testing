@@ -4,10 +4,10 @@ inputs:
   pipeline-id: 
     description: 'The build definition ID to get the current build count for'
     required: true
-  ado_token: 
+  ado-token: 
     description: 'The Azure DevOps PAT token'
     required: true
-  ado_url: 
+  ado-url: 
     description: 'The Azure DevOps URL'
     required: true
   old-build-count: 
