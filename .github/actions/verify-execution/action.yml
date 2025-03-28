@@ -1,0 +1,43 @@
+name: 'Verify Execution'
+description: 'Verify that a new pipeline execution was created'
+inputs:
+  pipeline-id: 
+    description: 'The build definition ID to get the current build count for'
+    required: true
+  ado_token: 
+    description: 'The Azure DevOps PAT token'
+    required: true
+  ado_url: 
+    description: 'The Azure DevOps URL'
+    required: true
+  old-build-count: 
+    description: 'The previous build count to compare against'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get new build count
+      id: get-current-build-count
+      uses: ./.github/actions/get-build-definition-id
+      with:
+        pipeline-id: ${{ inputs.pipeline-id }}
+        ado-token: ${{ inputs.ado_token }}
+        ado-url: ${{ inputs.ado_url }}
+
+    - name: Verify new pipeline execution
+      with:
+        OLD_BUILD_COUNT: ${{ inputs.old-build-count }}
+        NEW_BUILD_COUNT: ${{ steps.get-current-build-count.outputs.CURRENT_BUILD_COUNT }}
+      run: |
+        echo "Verifying new pipeline execution was created"
+
+        echo "New build count: $NEW_BUILD_COUNT"
+        echo "Previous build count: $OLD_BUILD_COUNT"
+
+        if [ "$NEW_BUILD_COUNT" -gt "$OLD_BUILD_COUNT" ]; then
+          echo "✅ New pipeline execution confirmed!"
+        else
+          echo "❌ No new pipeline execution detected!"
+          exit 1
+        fi
