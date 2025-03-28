@@ -53,10 +53,10 @@ runs:
 
         # If we have build variables, verify they match paramters
         if [ -n "$VARIABLES" ]; then
-          echo "echo variables: $VARIABLES"
+          echo "variables: $VARIABLES"
           
           echo "build_results: $BUILD_RESULTS"
-          echo "parameters $(echo "$BUILD_RESULTS" | jq -c '.parameters)""
+          echo "parameters: $(echo "$BUILD_RESULTS" | jq -c '.parameters)"
 
 
           PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson | sort_by(keys | tostring)')
