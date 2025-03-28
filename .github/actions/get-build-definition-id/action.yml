@@ -44,6 +44,5 @@ runs:
         else
             BUILD_DEFINITION_ID=$(echo "$DEF_RESULTS" | jq -r '.value[0].id')
             echo "Build definition ID for pipeline '$PIPELINE_NAME' is $BUILD_DEFINITION_ID."
-            echo "PIPELINE_ID=$BUILD_DEFINITION_ID"
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_OUTPUT
         fi
