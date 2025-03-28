@@ -23,6 +23,13 @@ jobs:
           ado-token: ${{ secrets.ADO_TOKEN }}
           ado-url: ${{ vars.ADO_URL }}
 
+      - name: Test
+        run: |
+          echo "Running integration tests for pipeline ID: ${{ steps.get-build-definition-id.outputs.pipeline-id }}"
+          env
+        env:
+          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
+
       - name: Get current build count
         id: get-current-build-count
         uses: ./.github/actions/get-current-build-count
