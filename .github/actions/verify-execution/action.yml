@@ -38,7 +38,8 @@ runs:
         BUILD_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":$ADO_TOKEN" | base64 -w0)" "$ADO_URL/_apis/build/builds/$BUILD_ID")
         echo "Build results: $BUILD_RESULTS"
         echo "Formatting build results for readability"
-        echo "build results: $(echo \"$BUILD_RESULTS\" | jq .)"
+        BUILD_RESULTS_CLEAN=$(echo "$BUILD_RESULTS" | jq .)
+        echo "build results: $BUILD_RESULTS_CLEAN"
 
         # Verify definition.name matches the pipeline name
         BUILD_DEFINITION_NAME=$(echo \"$BUILD_RESULTS\" | jq -r '.definition.name')
