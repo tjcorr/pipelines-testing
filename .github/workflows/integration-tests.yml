@@ -18,22 +18,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get build definition ID
-        id: get-build-definition-id
-        uses: ./.github/actions/get-build-definition-id
-        with:
-          pipeline-name: ${{ env.pipeline-name }}
-          ado-token: ${{ secrets.ADO_TOKEN }}
-          ado-url: ${{ vars.ADO_URL }}
-
-      - name: Get current build count
-        id: get-current-build-count
-        uses: ./.github/actions/get-current-build-count
-        with:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
-          ado-token: ${{ secrets.ADO_TOKEN }}
-          ado-url: ${{ vars.ADO_URL }}
-
       - uses: tjcorr/pipelines@node20
         with: 
           azure-devops-project-url: ${{ vars.ADO_URL }}
@@ -43,10 +27,10 @@ jobs:
       - name: Verify new pipeline execution
         uses: ./.github/actions/verify-execution
         with:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
           ado-token: ${{ secrets.ADO_TOKEN }}
           ado-url: ${{ vars.ADO_URL }}
-          old-build-count: ${{ steps.get-current-build-count.outputs.current-build-count }}
+          pipeline-name: ${{ env.pipeline-name }}
+          build-url: ${{ steps.tjcorr-pipelines.outputs.pipeline-url }}
 
   basic-with-variables:
     name: Test Basic Pipeline Execution with Variables
@@ -54,38 +38,25 @@ jobs:
 
     env:
       pipeline-name: 'it-basic-var'
+      variables: '{ "testVar1": "testValue1", "testVar2": "testValue2" }'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get build definition ID
-        id: get-build-definition-id
-        uses: ./.github/actions/get-build-definition-id
-        with:
-          pipeline-name: ${{ env.pipeline-name }}
-          ado-token: ${{ secrets.ADO_TOKEN }}
-          ado-url: ${{ vars.ADO_URL }}
-
-      - name: Get current build count
-        id: get-current-build-count
-        uses: ./.github/actions/get-current-build-count
-        with:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
-          ado-token: ${{ secrets.ADO_TOKEN }}
-          ado-url: ${{ vars.ADO_URL }}
 
       - uses: tjcorr/pipelines@node20
         with: 
           azure-devops-project-url: ${{ vars.ADO_URL }}
           azure-pipeline-name: ${{ env.pipeline-name }}
           azure-devops-token: ${{ secrets.ADO_TOKEN }}
-          azure-pipeline-variables: '{ "testVar1": "testValue1", "testVar2": "testValue2" }'
+          azure-pipeline-variables: ${{ env.variables }}
 
       - name: Verify new pipeline execution
         uses: ./.github/actions/verify-execution
         with:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
           ado-token: ${{ secrets.ADO_TOKEN }}
           ado-url: ${{ vars.ADO_URL }}
-          old-build-count: ${{ steps.get-current-build-count.outputs.current-build-count }}
+          pipeline-name: ${{ env.pipeline-name }}
+          build-url: ${{ steps.tjcorr-pipelines.outputs.pipeline-url }}
+          variables: ${{ env.variables }}
+  

@@ -1,44 +1,62 @@
 name: 'Verify Execution'
 description: 'Verify that a new pipeline execution was created'
 inputs:
-  pipeline-id: 
-    description: 'The build definition ID to get the current build count for'
-    required: true
   ado-token: 
     description: 'The Azure DevOps PAT token'
     required: true
   ado-url: 
     description: 'The Azure DevOps URL'
     required: true
-  old-build-count: 
-    description: 'The previous build count to compare against'
+  pipeline-name: 
+    description: 'The name of the pipeline to verify execution for'
     required: true
+  build-url: 
+    description: 'The URL of the pipeline build'
+    required: true
+  variables:
+    description: 'The variables to pass to the pipeline' 
+    required: false
 
 runs:
   using: "composite"
   steps:
-    - name: Get new build count
-      id: get-current-build-count
-      uses: ./.github/actions/get-current-build-count
-      with:
-        pipeline-id: ${{ inputs.pipeline-id }}
-        ado-token: ${{ inputs.ado-token }}
-        ado-url: ${{ inputs.ado-url }}
-
-    - name: Verify new pipeline execution
+    - name: Verify build queued successfully
       shell: bash
       env:
-        NEW_BUILD_COUNT: ${{ steps.get-current-build-count.outputs.current-build-count }}
-        OLD_BUILD_COUNT: ${{ inputs.old-build-count }}
+        ADO_TOKEN: ${{ inputs.ado-token }}
+        ADO_URL: ${{ inputs.ado-url }}
+        PIPELINE_NAME: ${{ inputs.pipeline-name }}
+        BUILD_ID: ${{ inputs.build-id }}
+        VARIABLES: ${{ inputs.variables }}
       run: |
         echo "Verifying new pipeline execution was created"
 
-        echo "New build count: $NEW_BUILD_COUNT"
-        echo "Previous build count: $OLD_BUILD_COUNT"
+        # Parse build number from the build url 
+        BUILD_ID=$(echo "$BUILD_URL" | grep -oP '(?<=buildId=)\d+')
 
-        if [ "$NEW_BUILD_COUNT" -gt "$OLD_BUILD_COUNT" ]; then
-          echo "✅ New pipeline execution confirmed!"
-        else
-          echo "❌ No new pipeline execution detected!"
+        # Fetch the latest build details
+        BUILD_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":$ADO_TOKEN" | base64 -w0)" "$ADO_URL/_apis/build/builds/$BUILD_ID")
+
+        # Verify definition.name matches the pipeline name
+        BUILD_DEFINITION_NAME=$(echo "$BUILD_RESULTS" | jq -r '.definition.name')
+        if [ "$BUILD_DEFINITION_NAME" != "$PIPELINE_NAME" ]; then
+          echo "❌ Pipeline name does not match the expected name! Found: $BUILD_DEFINITION_NAME, Expected: $PIPELINE_NAME"
           exit 1
+        fi
+
+        # Verify validationResults is []
+        VALIDATION_RESULTS=$(echo "$BUILD_RESULTS" | jq -r '.validationResults')
+        if [ "$VALIDATION_RESULTS" != "[]" ]; then
+          echo "❌ Validation results are not empty!"
+          exit 1
+        fi
+
+        # If we have build variables, verify they match paramters
+        if [ -n "$VARIABLES" ]; then
+          PARAMTERS=$(echo "$BUILD_RESULTS" | jq -r '.parameters')
+
+          if [ "$PARAMTERS" != "$VARIABLES" ]; then
+            echo "❌ Pipeline variables do not match the expected variables! Found: $PARAMTERS, Expected: $VARIABLES"
+            exit 1
+          fi
         fi
