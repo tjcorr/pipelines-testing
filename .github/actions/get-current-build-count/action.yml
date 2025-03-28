@@ -20,15 +20,11 @@ runs:
   steps:
     - name: Get current build count
       id: get-current-build-count
-      env:
-        PIPELINE_ID: ${{ inputs.pipeline-id }}
-        ADO_TOKEN: ${{ inputs.ado-token }}
-        ADO_URL: ${{ inputs.ado-url }}
       shell: bash
       run: |
-        echo "Getting current build count for pipeline ID $PIPELINE_ID"
-        CURRENT_BUILD_COUNT=$(curl -s -H "Authorization: Basic $(echo -n ":$ADO_TOKEN}" | base64 -w0)" \
-          "$ADO_URL/_apis/build/builds?api-version=6.0&definitions=$PIPELINE_ID&queryOrder=queueTimeDescending&\$top=1" | \
+        echo "Getting current build count for pipeline ID ${{ inputs.pipeline-id }}"
+        CURRENT_BUILD_COUNT=$(curl -s -H "Authorization: Basic $(echo -n ":${{ inputs.ado-token }}}" | base64 -w0)" \
+          "${{ inputs.ado-url }}/_apis/build/builds?api-version=6.0&definitions=${{ inputs.pipeline-id }}&queryOrder=queueTimeDescending&\$top=1" | \
           jq '.value[0].id')
         echo "CURRENT_BUILD_COUNT=$CURRENT_BUILD_COUNT" >> $GITHUB_ENV
         echo "Current build count: $CURRENT_BUILD_COUNT"
