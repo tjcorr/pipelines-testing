@@ -26,7 +26,7 @@ runs:
         ADO_TOKEN: ${{ inputs.ado-token }}
         ADO_URL: ${{ inputs.ado-url }}
         PIPELINE_NAME: ${{ inputs.pipeline-name }}
-        BUILD_ID: ${{ inputs.build-id }}
+        BUILD_URL: ${{ inputs.build-url }}
         VARIABLES: ${{ inputs.variables }}
       run: |
         echo "Verifying new pipeline execution was created"
