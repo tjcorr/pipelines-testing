@@ -55,7 +55,7 @@ runs:
         if [ -n "$VARIABLES" ]; then
           echo "variables: $VARIABLES"
           
-          DEBUG_PARAMETERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters)
+          DEBUG_PARAMETERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters')
           echo "parameters: $DEBUG_PARAMETERS"
 
           PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson | sort_by(keys | tostring)')
