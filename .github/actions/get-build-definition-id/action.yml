@@ -38,3 +38,10 @@ runs:
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_ENV
         fi
 
+    - name: Test output
+      shell: bash
+      run: |
+        echo "output: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}"
+
+
+
