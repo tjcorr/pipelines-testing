@@ -22,6 +22,8 @@ runs:
       id: get-build-definition-id
       shell: bash
       run: |
+        echo "PRE_TEST=123" >> $GITHUB_ENV
+
         echo "Getting build definition ID for pipeline ${{ inputs.pipeline-name }}"
         DEF_RESULTS=$(curl -s -H "Authorization: Basic $(echo -n ":${{ inputs.ado-token }}" | base64 -w0)" \
           "${{ inputs.ado-url }}/_apis/build/definitions?name=${{ inputs.pipeline-name }}")
@@ -37,14 +39,10 @@ runs:
             echo "Build definition ID for pipeline '${{ inputs.pipeline-name }}' is $BUILD_DEFINITION_ID."
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID"
             echo "PIPELINE_ID=$BUILD_DEFINITION_ID" >> $GITHUB_ENV
+            echo "MID_TEST=456" >> $GITHUB_ENV
         fi
 
-    # - name: Dump GitHub context
-    #   shell: bash
-    #   env:
-    #     STEPS_CONTEXT: ${{ toJson(steps) }}
-    #   run: |
-    #     echo "$STEPS_CONTEXT"
+        echo "POST_TEST=789" >> $GITHUB_ENV
 
     - name: Test output
       shell: bash
