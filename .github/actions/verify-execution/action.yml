@@ -51,20 +51,13 @@ runs:
           exit 1
         fi
 
-        # If we have build variables, verify they match paramters
+        # If we have build variables, verify they match parameters
         if [ -n "$VARIABLES" ]; then
-          echo "variables: $VARIABLES"
-          
-          DEBUG_PARAMETERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson')
-          echo "parameters: $DEBUG_PARAMETERS"
-
-          PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c --sort-keys '.parameters | fromjson')
-          echo "parameters: $PARAMTERS"
-
+          PARAMETERS=$(echo "$BUILD_RESULTS" | jq -c --sort-keys '.parameters | fromjson')
           NORMALIZED_VARIABLES=$(echo "$VARIABLES" | jq -c --sort-keys)
 
-          if [ "$PARAMTERS" != "$NORMALIZED_VARIABLES" ]; then
-            echo "❌ Pipeline variables do not match the expected variables! Found: $PARAMTERS, Expected: $NORMALIZED_VARIABLES"
+          if [ "$PARAMETERS" != "$NORMALIZED_VARIABLES" ]; then
+            echo "❌ Pipeline variables do not match the expected variables! Found: $PARAMETERS, Expected: $NORMALIZED_VARIABLES"
             exit 1
           fi
         fi
