@@ -40,7 +40,7 @@ jobs:
       - name: Verify new pipeline execution
         uses: ./.github/actions/verify-execution
         with:
-          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline }}
+          pipeline-id: ${{ steps.get-build-definition-id.outputs.pipeline-id }}
           ado-token: ${{ secrets.ADO_TOKEN }}
           ado-url: ${{ vars.ADO_URL }}
           old-build-count: ${{ steps.get-current-build-count.outputs.current-build-count }}
