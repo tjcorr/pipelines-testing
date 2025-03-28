@@ -22,8 +22,8 @@ runs:
       id: get-build-definition-id
       env:
         PIPELINE_NAME: ${{ inputs.pipeline-name }}
-        ADO_TOKEN: ${{ inputs.ado_token }}
-        ADO_URL: ${{ inputs.ado_url }}
+        ADO_TOKEN: ${{ inputs.ado-token }}
+        ADO_URL: ${{ inputs.ado-url }}
       shell: bash
       run: |
         echo "Getting build definition ID for pipeline $PIPELINE_NAME"

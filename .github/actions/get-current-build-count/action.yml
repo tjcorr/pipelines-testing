@@ -22,8 +22,8 @@ runs:
       id: get-current-build-count
       env:
         PIPELINE_ID: ${{ inputs.pipeline-id }}
-        ADO_TOKEN: ${{ inputs.ado_token }}
-        ADO_URL: ${{ inputs.ado_url }}
+        ADO_TOKEN: ${{ inputs.ado-token }}
+        ADO_URL: ${{ inputs.ado-url }}
       shell: bash
       run: |
         echo "Getting current build count for pipeline ID $PIPELINE_ID"

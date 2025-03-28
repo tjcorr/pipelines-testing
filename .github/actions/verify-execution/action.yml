@@ -22,8 +22,8 @@ runs:
       uses: ./.github/actions/get-build-definition-id
       with:
         pipeline-id: ${{ inputs.pipeline-id }}
-        ado-token: ${{ inputs.ado_token }}
-        ado-url: ${{ inputs.ado_url }}
+        ado-token: ${{ inputs.ado-token }}
+        ado-url: ${{ inputs.ado-url }}
 
     - name: Verify new pipeline execution
       with:
