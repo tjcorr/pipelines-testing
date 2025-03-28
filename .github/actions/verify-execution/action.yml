@@ -58,7 +58,7 @@ runs:
           DEBUG_PARAMETERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson')
           echo "parameters: $DEBUG_PARAMETERS"
 
-          PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters' | fromjson | sort_by(keys | tostring)')
+          PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson | sort_by(keys | tostring)')
           NORMALIZED_VARIABLES=$(echo "$VARIABLES" | jq -c 'sort_by(keys | tostring)')
 
           if [ "$PARAMTERS" != "$NORMALIZED_VARIABLES" ]; then
