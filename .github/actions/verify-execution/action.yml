@@ -53,7 +53,7 @@ runs:
 
         # If we have build variables, verify they match paramters
         if [ -n "$VARIABLES" ]; then
-          PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | sort_by(keys | tostring)')
+          PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson | sort_by(keys | tostring)')
           NORMALIZED_VARIABLES=$(echo "$VARIABLES" | jq -c 'sort_by(keys | tostring)')
 
           if [ "$PARAMTERS" != "$NORMALIZED_VARIABLES" ]; then
