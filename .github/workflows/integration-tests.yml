@@ -25,7 +25,7 @@ jobs:
 
       - name: Get current build count
         id: get-current-build-count
-        uses: ./.github/actions/get-build-definition-id
+        uses: ./.github/actions/get-current-build-count
         with:
           pipeline-id: ${{ steps.get-build-definition-id.outputs.PIPELINE_ID }}
           ado-token: ${{ secrets.ADO_TOKEN }}
