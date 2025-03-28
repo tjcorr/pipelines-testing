@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Get build definition ID
         id: get-build-definition-id
         uses: ./.github/actions/get-build-definition-id
