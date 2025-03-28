@@ -59,7 +59,9 @@ runs:
           echo "parameters: $DEBUG_PARAMETERS"
 
           PARAMTERS=$(echo "$BUILD_RESULTS" | jq -c '.parameters | fromjson | sort_by(keys | tostring)')
-          NORMALIZED_VARIABLES=$(echo "$VARIABLES" | jq -c 'sort_by(keys | tostring)')
+          echo "parameters: $PARAMTERS"
+
+          NORMALIZED_VARIABLES=$(echo "$VARIABLES" | jq -c --sort-keys)
 
           if [ "$PARAMTERS" != "$NORMALIZED_VARIABLES" ]; then
             echo "❌ Pipeline variables do not match the expected variables! Found: $PARAMTERS, Expected: $NORMALIZED_VARIABLES"
